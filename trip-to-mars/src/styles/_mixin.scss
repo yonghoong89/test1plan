@@ -1,0 +1,111 @@
+@use "sass:math";
+
+// iOS safe-area 포함한 상단간격 지정
+@mixin safeAreaPaddingTop($padding-top: 0px, $additional-padding-top: 0px) {
+  $safeAreaInsetTop: env(safe-area-inset-top);
+  padding-top: calc(#{$padding-top} + #{$additional-padding-top});
+  @supports (padding-top: $safeAreaInsetTop) {
+    padding-top: calc(
+      #{$safeAreaInsetTop} + #{$padding-top} + #{$additional-padding-top}
+    );
+  }
+}
+
+// iOS safe-area 포함한 하단간격 지정
+@mixin safeAreaPaddingBottom($padding-bottom: 0px) {
+  $safeAreaInsetBottom: env(safe-area-inset-bottom);
+  padding-bottom: $padding-bottom;
+  @supports (padding-bottom: $safeAreaInsetBottom) {
+    padding-bottom: calc(#{$safeAreaInsetBottom} + #{$padding-bottom});
+  }
+}
+
+@mixin setSafeAreaTopByOs() {
+  @include safeAreaPaddingTop(0px, 0px);
+
+  :global(.is-android) & {
+    @include safeAreaPaddingTop(40px, 0px);
+  }
+}
+
+// 스크롤 Y
+@mixin overflowScrollY() {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar,
+  &::-webkit-scrollbar-thumb {
+    height: 0;
+    width: 0;
+    display: none;
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+// 스크롤 X
+@mixin overflowScrollX($sideGap: 0px) {
+  padding-left: $sideGap;
+  white-space: nowrap;
+  overflow-y: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar,
+  &::-webkit-scrollbar-thumb {
+    height: 0;
+    width: 0;
+    display: none;
+    background-color: rgba(0, 0, 0, 0);
+  }
+  > * {
+    display: inline-flex;
+    &:last-of-type {
+      padding-right: $sideGap;
+    }
+  }
+}
+
+// press 효과
+@mixin pressEffect {
+  transform-origin: center;
+  @include mixins.press-dim;
+  @include mixins.press-effect;
+  &:not(:disabled) {
+    cursor: pointer;
+    &:active {
+      @include mixins.press-dim-effect;
+    }
+  }
+}
+
+// 리스트에서 주로 사용하는 점
+@mixin bullet {
+  position: relative;
+  padding-left: 16px;
+  &::before {
+    position: absolute;
+    top: -1px;
+    left: 5px;
+    color: currentColor;
+    font-weight: 600;
+    @supports (content: "x" / "y") {
+      content: "•" / "";
+    }
+    @supports not (content: "x" / "y") {
+      content: "•";
+      alt: "";
+    }
+  }
+}
+
+// 커스텀 다크모드
+@mixin darkMode {
+  :global(.dark_mode:not(.dark_mode_off)) & {
+    @content;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:not(.dark_mode_off)) {
+      @content;
+    }
+  }
+}
