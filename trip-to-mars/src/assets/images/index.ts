@@ -1,0 +1,1 @@
+export { default as TestFriend } from "./test.png"
